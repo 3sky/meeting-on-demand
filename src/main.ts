@@ -1,23 +1,31 @@
-import { App, Stack, StackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { App } from 'aws-cdk-lib';
+import { BaseStack } from './base';
+import { JitsiStack } from './jitsi';
 
-export class MyStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps = {}) {
-    super(scope, id, props);
-
-    // define resources here...
-  }
-}
-
-// for development, use account/region from cdk cli
 const devEnv = {
-  account: process.env.CDK_DEFAULT_ACCOUNT,
-  region: process.env.CDK_DEFAULT_REGION,
+  account: '471112990549',
+  region: 'eu-central-1',
 };
 
 const app = new App();
+const base = new BaseStack(app, 'jitsi-base', {
+  env: devEnv,
+  stackName: 'jitsi-base',
+});
 
-new MyStack(app, 'jitsi-dev', { env: devEnv });
-// new MyStack(app, 'jitsi-prod', { env: prodEnv });
+new JitsiStack(app, 'jitsi',
+  {
+    env: devEnv,
+    stackName: 'temporary-jitsi',
+    sg: base.privateSecurityGroup,
+    listener: base.listener,
+    ecsCluster: base.ecsCluster,
+    namespace: base.namespace,
+    // image versions
+    JITSI_IMAGE_VERSION: 'stable-9584-1',
+  },
+
+);
+
 
 app.synth();
