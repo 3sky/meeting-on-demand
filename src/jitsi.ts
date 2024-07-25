@@ -10,7 +10,8 @@ export interface JitsiStackProps extends cdk.StackProps {
   listener: elbv2.ApplicationListener;
   ecsCluster: ecs.Cluster;
   namespace: servicediscovery.PrivateDnsNamespace;
-  JITSI_IMAGE_VERSION: string;
+  domainName: string;
+  jitsiImageVersion: string;
 }
 
 export class JitsiStack extends cdk.Stack {
@@ -22,11 +23,8 @@ export class JitsiStack extends cdk.Stack {
     const theListner = props.listener;
     const theCluster = props.ecsCluster;
     const theNamespace = props.namespace;
-    const IMAGE_VERSION = props.JITSI_IMAGE_VERSION;
-
-    cdk.Tags.of(this).add('description', 'Jitsi Demo');
-    cdk.Tags.of(this).add('organization', '3sky.dev');
-    cdk.Tags.of(this).add('owner', '3sky');
+    const theDomainName = props.domainName;
+    const jitsiImageVersion = props.jitsiImageVersion;
 
     let JICOFO_AUTH_PASSWORD: string = '2dAZl8Jkeg5cKT/rbJDZcslGCWt1cA3NnF4QqkFFATY=';
     let JVB_AUTH_PASSWORD: string = 'Tph1fJEdU6lFY8aTNPz4EpI5iewQXl+Ot17IeGCmvBs=';
@@ -46,10 +44,10 @@ export class JitsiStack extends cdk.Stack {
     });
 
     ecsTaskDefinition.addContainer('web', {
-      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-web:' + IMAGE_VERSION),
+      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-web:' + jitsiImageVersion),
       environment: {
         TZ: 'Europe/Warsaw',
-        PUBLIC_URL: 'https://meet.3sky.in',
+        PUBLIC_URL: 'https://meet.' + theDomainName,
       },
       portMappings: [
         {
@@ -65,7 +63,7 @@ export class JitsiStack extends cdk.Stack {
     });
 
     ecsTaskDefinition.addContainer('jicofo', {
-      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-jicofo:' + IMAGE_VERSION),
+      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-jicofo:' + jitsiImageVersion),
       environment: {
         TZ: 'Europe/Warsaw',
         JICOFO_AUTH_PASSWORD: JICOFO_AUTH_PASSWORD,
@@ -82,7 +80,7 @@ export class JitsiStack extends cdk.Stack {
     });
 
     ecsTaskDefinition.addContainer('jvb', {
-      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-jvb:' + IMAGE_VERSION),
+      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-jvb:' + jitsiImageVersion),
       environment: {
         TZ: 'Europe/Warsaw',
         JVB_AUTH_PASSWORD: JVB_AUTH_PASSWORD,
@@ -102,7 +100,7 @@ export class JitsiStack extends cdk.Stack {
     });
 
     const prosody = ecsTaskDefinition.addContainer('prosody', {
-      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-prosody:' + IMAGE_VERSION),
+      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-prosody:' + jitsiImageVersion),
       environment: {
         TZ: 'Europe/Warsaw',
         JIBRI_RECORDER_PASSWORD: JIBRI_RECORDER_PASSWORD,

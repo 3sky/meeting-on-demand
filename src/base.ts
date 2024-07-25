@@ -7,22 +7,20 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as servicediscovery from 'aws-cdk-lib/aws-servicediscovery';
 import { Construct } from 'constructs';
 
+export interface BaseStackProps extends cdk.StackProps {
+  domainName: string;
+}
+
 export class BaseStack extends cdk.Stack {
   public readonly privateSecurityGroup: ec2.SecurityGroup;
   public readonly listener: elbv2.ApplicationListener;
   public readonly ecsCluster: ecs.Cluster;
   public readonly namespace: servicediscovery.PrivateDnsNamespace;
 
-
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: BaseStackProps) {
     super(scope, id, props);
 
-    cdk.Tags.of(this).add('description', 'Temporary Jitsi');
-    cdk.Tags.of(this).add('organization', '3sky.dev');
-    cdk.Tags.of(this).add('owner', '3sky');
-
-
-    let DOMAIN_NAME: string = '3sky.in';
+    const theDomainName = props.domainName;
 
     const vpc = new ec2.Vpc(this, 'VPC', {
       ipAddresses: ec2.IpAddresses.cidr('10.192.0.0/20'),
@@ -70,7 +68,7 @@ export class BaseStack extends cdk.Stack {
       securityGroup: albSecurityGroup,
     });
 
-    const zone = route53.HostedZone.fromLookup(this, 'Zone', { domainName: DOMAIN_NAME });
+    const zone = route53.HostedZone.fromLookup(this, 'Zone', { domainName: theDomainName });
 
     this.namespace = new servicediscovery.PrivateDnsNamespace(this, 'Namespace', {
       name: 'meet.jitsi',
@@ -84,7 +82,7 @@ export class BaseStack extends cdk.Stack {
     });
 
     const albcert = new acme.Certificate(this, 'Certificate', {
-      domainName: 'meet.' + DOMAIN_NAME,
+      domainName: 'meet.' + theDomainName,
       certificateName: 'Temporary Jitsi service', // Optionally provide an certificate name
       validation: acme.CertificateValidation.fromDns(zone),
     });
