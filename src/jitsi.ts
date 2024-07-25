@@ -46,7 +46,7 @@ export class JitsiStack extends cdk.Stack {
     });
 
     ecsTaskDefinition.addContainer('web', {
-      image: ecs.ContainerImage.fromRegistry('jitsi/web:' + IMAGE_VERSION),
+      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-web:' + IMAGE_VERSION),
       environment: {
         TZ: 'Europe/Warsaw',
         PUBLIC_URL: 'https://meet.3sky.in',
@@ -65,7 +65,7 @@ export class JitsiStack extends cdk.Stack {
     });
 
     ecsTaskDefinition.addContainer('jicofo', {
-      image: ecs.ContainerImage.fromRegistry('jitsi/jicofo:' + IMAGE_VERSION),
+      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-jicofo:' + IMAGE_VERSION),
       environment: {
         TZ: 'Europe/Warsaw',
         JICOFO_AUTH_PASSWORD: JICOFO_AUTH_PASSWORD,
@@ -82,7 +82,7 @@ export class JitsiStack extends cdk.Stack {
     });
 
     ecsTaskDefinition.addContainer('jvb', {
-      image: ecs.ContainerImage.fromRegistry('jitsi/jvb:' + IMAGE_VERSION),
+      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-jvb:' + IMAGE_VERSION),
       environment: {
         TZ: 'Europe/Warsaw',
         JVB_AUTH_PASSWORD: JVB_AUTH_PASSWORD,
@@ -102,7 +102,7 @@ export class JitsiStack extends cdk.Stack {
     });
 
     const prosody = ecsTaskDefinition.addContainer('prosody', {
-      image: ecs.ContainerImage.fromRegistry('jitsi/prosody:' + IMAGE_VERSION),
+      image: ecs.ContainerImage.fromRegistry('quay.io/3sky/jitsi-prosody:' + IMAGE_VERSION),
       environment: {
         TZ: 'Europe/Warsaw',
         JIBRI_RECORDER_PASSWORD: JIBRI_RECORDER_PASSWORD,
@@ -150,7 +150,7 @@ export class JitsiStack extends cdk.Stack {
     });
 
     theListner.addTargets('ECS', {
-      port: 443,
+      port: 80,
       targets: [ecsService],
       healthCheck: {
         port: '80',
@@ -158,6 +158,7 @@ export class JitsiStack extends cdk.Stack {
         interval: cdk.Duration.seconds(30),
         timeout: cdk.Duration.seconds(5),
         healthyHttpCodes: '200',
+        protocol: elbv2.Protocol.HTTP,
       },
     });
   }

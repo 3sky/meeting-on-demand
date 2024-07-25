@@ -8,15 +8,15 @@ const devEnv = {
 };
 
 const app = new App();
-const base = new BaseStack(app, 'jitsi-base', {
+const base = new BaseStack(app, 'jitsi-baseline', {
   env: devEnv,
-  stackName: 'jitsi-base',
+  stackName: 'jitsi-baseline',
 });
 
-new JitsiStack(app, 'jitsi',
+new JitsiStack(app, 'jitsi-instance',
   {
     env: devEnv,
-    stackName: 'temporary-jitsi',
+    stackName: 'jitsi-instnace',
     sg: base.privateSecurityGroup,
     listener: base.listener,
     ecsCluster: base.ecsCluster,
