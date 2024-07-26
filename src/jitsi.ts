@@ -54,10 +54,6 @@ export class JitsiStack extends cdk.Stack {
           containerPort: 80,
           protocol: ecs.Protocol.TCP,
         },
-        {
-          containerPort: 443,
-          protocol: ecs.Protocol.TCP,
-        },
       ],
       logging: new ecs.AwsLogDriver({ streamPrefix: this.stackName + '-web' }),
     });

@@ -57,8 +57,6 @@ export class BaseStack extends cdk.Stack {
 
     this.privateSecurityGroup.addIngressRule(albSecurityGroup, ec2.Port.tcp(80), 'Allow traffic for health checks');
 
-    this.privateSecurityGroup.addIngressRule(albSecurityGroup, ec2.Port.tcp(443), 'Allow traffic for health checks');
-
     const alb = new elbv2.ApplicationLoadBalancer(this, 'ApplicationLB', {
       vpc: vpc,
       vpcSubnets: {
