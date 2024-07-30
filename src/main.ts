@@ -20,7 +20,7 @@ const base = new BaseStack(app, 'jitsi-baseline', {
 new JitsiStack(app, 'jitsi-instance',
   {
     env: devEnv,
-    stackName: 'jitsi-instnace',
+    stackName: 'jitsi-instance',
     sg: base.privateSecurityGroup,
     listener: base.listener,
     ecsCluster: base.ecsCluster,
